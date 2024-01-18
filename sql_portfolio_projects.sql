@@ -90,10 +90,43 @@
 --there are too many preceding rows to order by location and date 
 --therefore need to add command "rows unbounded preceding" 
 --to expand the range of windows frame(number of rows) larger than default limitation of 1020 bytes
+--Use CTE, because alias does not work like a column
+--with PopvsVac(continent, location, date, population, new_vaccinations, Accumulated_Vaccnation)
+--as(
+--select continent, location, date, population, new_vaccinations, 
+--sum(new_vaccinations) 
+--over (partition by location order by location, date rows unbounded preceding) as Accumulated_Vaccination--(Accumulated_Vaccination/population) *100
+--from PortfolioProject01..covidVaccinations
+--where continent is not null
+--)
+--select *, Accumulated_Vaccnation/population * 100
+--from PopvsVac
+
+
+--temp table
+--Drop table if exists #PercentPopulationVaccinated
+--Create table #PercentPopulationVaccinated
+--(
+--Continent varchar(255),
+--Location varchar(255),
+--Date date,
+--Population numeric,
+--New_Vaccination numeric,
+--Accumulated_Vaccination numeric
+--)
+--insert into #PercentPopulationVaccinated
+--select continent, location, date, population, new_vaccinations, 
+--sum(new_vaccinations) 
+--over (partition by location order by location, date rows unbounded preceding) as Accumulated_Vaccination--(Accumulated_Vaccination/population) *100
+--from PortfolioProject01..covidVaccinations
+--where continent is not null
+--select *, Accumulated_Vaccination/population * 100
+--from #PercentPopulationVaccinated
+
+
+Create view PercentPopulationVaccinated as
 select continent, location, date, population, new_vaccinations, 
 sum(new_vaccinations) 
-over (partition by location order by location, date rows unbounded preceding) as Accumulated_Vaccination
+over (partition by location order by location, date rows unbounded preceding) as Accumulated_Vaccination--(Accumulated_Vaccination/population) *100
 from PortfolioProject01..covidVaccinations
 where continent is not null
-order by 1,2
-
